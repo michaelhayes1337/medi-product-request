@@ -1,9 +1,50 @@
 import { createContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
+
+type Page = {
+  name: string;
+  url: string;
+  index: number;
+};
+const homePage = {
+  name: "Home",
+  url: "/",
+  index: 0,
+};
+const applyPage = {
+  name: "Apply",
+  url: "/apply",
+  index: 1,
+};
+const faqPage = {
+  name: "FAQ",
+  url: "/faq",
+  index: 2,
+};
+const errorPage = {
+  name: "error",
+  url: "/404",
+  index: 3,
+};
+
+const allPagesArr: Page[] = [homePage, applyPage, faqPage, errorPage];
+type allPagesObjType = {
+  [index: string]: Page;
+};
+const allPagesObj: allPagesObjType = {
+  homePage: homePage,
+  applyPage: applyPage,
+  faqPage: faqPage,
+  errorPage: errorPage,
+};
 interface NavigationContextType {
-  selected: number;
-  setSelected: (num: number) => void;
+  getSelectedPage: Page;
+  setSelectedPage: (page: Page) => void;
+  getPagesArr: Page[];
+  getPagesObj: allPagesObjType;
+  getSelectedPageIndex: number;
 }
+
 const NavigationContext = createContext<NavigationContextType | null>(null);
 
 type Props = {
@@ -11,41 +52,39 @@ type Props = {
 };
 
 export const NavigationContextProvider: React.FC<Props> = (props: Props) => {
-  const [selected, setSelected] = useState(0);
-  const defaultContextValues = {
-    selected,
-    setSelected,
-  };
   const router = useRouter();
+  const [selectedPage, setSelectedPage] = useState<Page>(allPagesObj.homePage);
+
+  const handleGetSelectedPageIndex = () => {
+    return selectedPage.index;
+  };
+
+  const defaultContextValues = {
+    getSelectedPage: selectedPage,
+    setSelectedPage: setSelectedPage,
+    getPagesArr: allPagesArr,
+    getPagesObj: allPagesObj,
+    getSelectedPageIndex: handleGetSelectedPageIndex(),
+  };
+
   useEffect(() => {
     switch (router.asPath) {
       case "/":
-        setSelected(0);
+        setSelectedPage(allPagesObj.homePage);
         break;
-      case "/about":
-        setSelected(1);
+      case "/apply":
+        setSelectedPage(allPagesObj.applyPage);
         break;
-      case "/roadmap":
-        setSelected(2);
-        break;
-      case "/pricing":
-        setSelected(3);
-        break;
-      case "/contact":
-        setSelected(4);
-        break;
-      case "/signup":
-        setSelected(5);
-        break;
-      case "/signin":
-        setSelected(6);
+      case "/faq":
+        setSelectedPage(allPagesObj.faqPage);
         break;
       default:
         // not a page on the navigation bar
-        setSelected(-1);
+        setSelectedPage(allPagesObj.homePage);
         break;
     }
   }, [router.asPath]);
+
   return (
     <NavigationContext.Provider value={defaultContextValues}>
       {props.children}

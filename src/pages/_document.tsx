@@ -1,8 +1,14 @@
 import * as React from "react";
+// Next
 import Document, { Html, Head, Main, NextScript } from "next/document";
+// MUI
 import createEmotionServer from "@emotion/server/create-instance";
 import theme from "../theme";
 import createEmotionCache from "../createEmotionCache";
+// Azure
+// import { PublicClientApplication } from "@azure/msal-browser";
+// import { msalConfig } from "../../authConfig";
+// export const msalInstance = new PublicClientApplication(msalConfig);
 
 export default class MyDocument extends Document {
   render() {

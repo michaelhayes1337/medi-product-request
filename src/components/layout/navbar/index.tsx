@@ -1,51 +1,36 @@
-import DrawerComponent from "../mobileNavigationDrawer";
-import LogoIcon from "../../../assets/icons/logoIcon";
+// React
 import * as React from "react";
-
+import { useContext } from "react";
+// Next
+import { useRouter } from "next/router";
+import Image from "next/image";
+// Mui
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
-const pages = ["Home", "About", "Roadmap", "Pricing", "Contact Us"];
-import { useContext } from "react";
-import ctx from "../../../utility/context/navigationContext";
-// import colorList from '../../styles/colorList';
-
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-
-import Button from "@mui/material/Button";
-import { useRouter } from "next/router";
 import { useMediaQuery, useTheme } from "@mui/material";
+
+// Azure
+import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
+
+// General
+import DrawerComponent from "../mobileNavigationDrawer";
+import Logo from "../../../assets/images/mediclinicfull.png";
+import ctx from "../../../utility/context/navigationContext";
+import SignOutButton from "src/components/shared/signOutButton";
+import SignInSignUpButton from "src/components/shared/signInsignUpButton";
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
   const isMatch = useMediaQuery(theme.breakpoints.down("lg"));
-  const navbarCTX = useContext(ctx);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    switch (newValue) {
-      case 0:
-        router.push("/");
-        break;
-      case 1:
-        router.push("/about");
-        break;
-      case 2:
-        router.push("/roadmap");
-        break;
-      case 3:
-        router.push("/pricing");
-        break;
-      case 4:
-        router.push("/contact");
-        break;
-    }
-  };
+  const navigationCTX = useContext(ctx);
 
   return (
-    <AppBar position="static" elevation={0}>
+    <AppBar position="static" elevation={3}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -59,7 +44,7 @@ const Navbar: React.FC = () => {
               width: "15%",
             }}
           >
-            <LogoIcon></LogoIcon>
+            <Image src={Logo} alt="mediclinic logo" />
           </Box>
           {!isMatch && (
             <>
@@ -73,8 +58,10 @@ const Navbar: React.FC = () => {
                 }}
               >
                 <Tabs
-                  value={navbarCTX?.selected}
-                  onChange={handleChange}
+                  value={navigationCTX?.getSelectedPageIndex}
+                  onChange={() => {
+                    console.log("click");
+                  }}
                   textColor="secondary"
                   indicatorColor="secondary"
                   centered
@@ -85,12 +72,15 @@ const Navbar: React.FC = () => {
                     ".Mui-selected": { color: "#506C94", fontWeight: "700" },
                   }}
                 >
-                  {pages.map((page, index) => {
+                  {navigationCTX?.getPagesArr.map((page, index) => {
                     return (
                       <Tab
-                        value={index}
-                        label={page}
-                        key={page}
+                        value={page.index}
+                        label={page.name}
+                        key={page.name}
+                        onClick={(e) => {
+                          router.push(page.url);
+                        }}
                         sx={{
                           fontFamily: "Poppins",
                           color: "black",
@@ -110,36 +100,12 @@ const Navbar: React.FC = () => {
                   marginTop: "1%",
                 }}
               >
-                <Button
-                  variant="text"
-                  onClick={() => {
-                    router.push("/signup");
-                  }}
-                  sx={{
-                    fontFamily: "Poppins",
-                    color: "black",
-                    fontWeight: "400",
-                    textTransform: "none",
-                    fontSize: "18px",
-                  }}
-                >
-                  Sign Up
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontWeight: "400",
-                    textTransform: "none",
-                    fontSize: "18px",
-                  }}
-                  onClick={() => {
-                    router.push("/signup");
-                  }}
-                >
-                  Sign In
-                </Button>
+                <AuthenticatedTemplate>
+                  <SignOutButton />
+                </AuthenticatedTemplate>
+                <UnauthenticatedTemplate>
+                  <SignInSignUpButton />
+                </UnauthenticatedTemplate>
               </Box>
             </>
           )}

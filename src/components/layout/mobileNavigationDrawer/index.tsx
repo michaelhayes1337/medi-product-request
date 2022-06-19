@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Drawer, List, ListItemButton, ListItemText, IconButton, Divider } from "@mui/material";
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  IconButton,
+  Divider,
+  Box,
+} from "@mui/material";
 import { useContext } from "react";
 import ctx from "../../../utility/context/navigationContext";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -10,34 +18,8 @@ type Props = {
 
 const MobileNavigationDrawer = (props: Props) => {
   const [open, setOpen] = useState(false);
-  const navbarCTX = useContext(ctx);
-  const mapNameToRoute = (name: string) => {
-    let route = "/";
-    switch (name) {
-      case "Home":
-        route = "/";
-        break;
-      case "About":
-        route = "/about";
-        break;
-      case "Roadmap":
-        route = "/roadmap";
-        break;
-      case "Pricing":
-        route = "/pricing";
-        break;
-      case "Contact Us":
-        route = "/contact";
-        break;
-      case "Sign In":
-        route = "/signin";
-        break;
-      case "Sign Up":
-        route = "/signup";
-        break;
-    }
-    return route;
-  };
+  const navigationCTX = useContext(ctx);
+
   return (
     <>
       <Drawer
@@ -47,13 +29,13 @@ const MobileNavigationDrawer = (props: Props) => {
         anchor="right"
       >
         <List sx={{ width: "200px" }}>
-          {["Home", "About", "Roadmap", "Pricing", "Contact Us"].map((name, index) => {
-            const isNavigated = index === navbarCTX?.selected;
+          {navigationCTX?.getPagesArr.map((page, index) => {
+            const isNavigated = index === navigationCTX?.getSelectedPageIndex;
             return (
-              <Link href={mapNameToRoute(name)} key={name}>
+              <Link href={page.url} key={page.name}>
                 <ListItemButton>
                   <ListItemText
-                    primary={name}
+                    primary={page.name}
                     sx={{
                       textAlign: "right",
                       color: isNavigated ? "#506C94" : "black",
@@ -67,19 +49,17 @@ const MobileNavigationDrawer = (props: Props) => {
         <Divider />
         <List sx={{ width: "200px" }}>
           {["Sign Up", "Sign In"].map((name, index) => {
-            const isNavigated = index === navbarCTX!.selected! - 5;
             return (
-              <Link href={mapNameToRoute(name)} key={name}>
+              <Box key={name}>
                 <ListItemButton>
                   <ListItemText
                     primary={name}
                     sx={{
                       textAlign: "right",
-                      color: isNavigated ? "#506C94" : "black",
                     }}
                   />
                 </ListItemButton>
-              </Link>
+              </Box>
             );
           })}
         </List>
